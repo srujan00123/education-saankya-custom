@@ -67,7 +67,6 @@ class CourseSchedulingTool(Document):
 		fields = [
 			"course",
 			"room",
-			"instructor",
 			"from_time",
 			"to_time",
 			"course_start_date",
