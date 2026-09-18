@@ -26,11 +26,8 @@ class CourseSchedule(Document):
 
 	def set_title(self):
 		"""Set document Title"""
-		self.title = (
-			self.course
-			+ " by "
-			+ (self.instructor_name if self.instructor_name else self.instructor)
-		)
+		instructor = self.instructor_name or self.instructor
+		self.title = f"{self.course} by {instructor}" if instructor else self.course
 
 	def validate_course(self):
 		group_based_on, course = frappe.db.get_value(
@@ -93,7 +90,9 @@ class CourseSchedule(Document):
 		if self.student_group:
 			validate_overlap_for(self, "Course Schedule", "student_group")
 
-		validate_overlap_for(self, "Course Schedule", "instructor")
+		if self.instructor:
+			validate_overlap_for(self, "Course Schedule", "instructor")
+
 		validate_overlap_for(self, "Course Schedule", "room")
 
 		# validate overlapping assessment schedules.
@@ -101,7 +100,9 @@ class CourseSchedule(Document):
 			validate_overlap_for(self, "Assessment Plan", "student_group")
 
 		validate_overlap_for(self, "Assessment Plan", "room")
-		validate_overlap_for(self, "Assessment Plan", "supervisor", self.instructor)
+
+		if self.instructor:
+			validate_overlap_for(self, "Assessment Plan", "supervisor", self.instructor)
 
 	def set_hex_color(self):
 		colors = {
